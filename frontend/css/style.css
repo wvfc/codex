@@ -1,0 +1,206 @@
+/* =========================
+   SOUTECH Store – base limpa
+   ========================= */
+:root{
+  --brand: #004d61;
+  --bg: #ffffff;
+  --bg-soft: #f8f9fa;
+  --text: #0f172a;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+}
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+a{ color:var(--brand); text-decoration:none; }
+.container{ max-width:1200px; margin:0 auto; padding:0 16px; }
+
+/* =========================
+   Header / Nav (sempre legível)
+   ========================= */
+.header{
+  background:var(--brand);
+  color:#fff;
+  position:sticky; /* não cobre o conteúdo como fixed */
+  top:0;
+  z-index:1000;
+}
+.header .nav{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:10px 0;
+}
+.brand{ display:flex; align-items:center; gap:10px; }
+.brand-title{ margin:0; font-size:20px; color:#fff; white-space:nowrap; }
+.logo{ height:48px; }
+
+.nav a{
+  color:#fff;
+  padding:8px 10px;
+  line-height:1;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,.08);
+}
+.nav a:hover{ background:rgba(255,255,255,.10); }
+
+.user-chip{
+  color:#fff;
+  font-weight:600;
+  white-space:nowrap;
+}
+
+/* badge genérica (categorias) */
+.badge{
+  display:inline-block;
+  padding:2px 8px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:#fff;
+  font-size:12px;
+  color:var(--muted);
+}
+
+/* badge do carrinho (pequena e visível) */
+.badge--cart{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:20px; height:20px; padding:0 6px;
+  border-radius:999px; background:#fff; color:var(--brand);
+  font-size:12px; font-weight:600;
+}
+
+/* evita que a primeira âncora fique escondida atrás do header */
+main, .container{ scroll-margin-top:72px; }
+
+/* =========================
+   Banner / Seções
+   ========================= */
+.banner{
+  background:#003849; color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  height:200px; text-align:center;
+}
+.banner h2{ margin:0 12px; }
+
+.section{ padding:32px 0; }
+
+/* =========================
+   Cards / Grid
+   ========================= */
+.card{
+  background:var(--bg-soft);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:16px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+}
+@media (max-width:1024px){ .grid{ grid-template-columns:repeat(3,1fr); } }
+@media (max-width:768px){  .grid{ grid-template-columns:repeat(2,1fr); } }
+@media (max-width:520px){  .grid{ grid-template-columns:1fr; } }
+
+.grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+@media (max-width:640px){ .grid-2{ grid-template-columns:1fr; } }
+
+.row{ display:flex; align-items:center; gap:10px; }
+
+/* =========================
+   Botões
+   ========================= */
+.btn{
+  border:1px solid var(--border);
+  background:#fff;
+  color:var(--text);
+  padding:10px 14px;
+  border-radius:10px;
+  cursor:pointer;
+}
+.btn:hover{ background:#f3f4f6; }
+.btn.brand{ background:var(--brand); color:#fff; border-color:transparent; }
+
+/* =========================
+   Produtos (imagem do mesmo tamanho)
+   ========================= */
+.product-thumb{
+  width:100%;
+  aspect-ratio:1 / 1;          /* quadrada e consistente */
+  background:#f1f5f9;
+  border:1px solid var(--border);
+  border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+}
+.product-thumb img{
+  width:100%; height:100%;
+  object-fit:contain;           /* não distorce a imagem */
+}
+
+/* =========================
+   Filtros
+   ========================= */
+.filters{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr 140px;
+  gap:10px;
+  margin-top:16px;
+}
+@media (max-width:900px){ .filters{ grid-template-columns:1fr 1fr 140px; } }
+@media (max-width:640px){ .filters{ grid-template-columns:1fr; } }
+
+/* =========================
+   Cart (drawer)
+   ========================= */
+.cart-drawer{
+  position:fixed; top:0; right:-420px;
+  width:420px; max-width:100%; height:100%;
+  background:#fff; border-left:1px solid var(--border);
+  transition:right .25s; z-index:1050;
+  display:flex; flex-direction:column;
+}
+.cart-drawer.open{ right:0; }
+
+.cart-header, .cart-footer{
+  padding:16px; border-bottom:1px solid var(--border);
+}
+.cart-footer{
+  border-bottom:none; border-top:1px solid var(--border);
+  display:flex; flex-direction:column; gap:10px;
+}
+.cart-body{
+  flex:1; overflow:auto; padding:16px;
+  display:flex; flex-direction:column; gap:12px;
+}
+.cart-item{
+  display:grid; grid-template-columns:56px 1fr auto;
+  gap:12px; align-items:center;
+  border:1px solid var(--border);
+  border-radius:12px; padding:8px;
+}
+.total-line{ display:flex; justify-content:space-between; }
+
+/* =========================
+   Rodapé / Paginação
+   ========================= */
+.footer{
+  background:var(--brand); color:#fff; text-align:center;
+  padding:18px; font-size:14px; margin-top:28px;
+}
+.pagination{
+  display:flex; gap:10px; justify-content:center; margin-top:16px;
+}
+
+/* =========================
+   Utilitários
+   ========================= */
+.muted{ color:var(--muted); }

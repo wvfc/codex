@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin · SOUTECH</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <style>
+    /* mínimos ajustes visuais para o admin */
+    .admin-top { display:flex; align-items:center; gap:12px; }
+    .admin-top .pill { background:#e6f0ff; color:#0046d1; padding:4px 10px; border-radius:999px; font-size:.85rem; }
+    .tabs { display:flex; gap:8px; flex-wrap:wrap; margin:16px 0; }
+    .tabs .tab { border:1px solid #d6dee6; padding:10px 14px; border-radius:12px; cursor:pointer; background:#fff; }
+    .tabs .tab.active { background:var(--brand); color:#fff; border-color:var(--brand); }
+    .section.hidden { display:none }
+    .grid-3 { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px }
+    .grid-4 { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px }
+    @media (max-width: 1024px){ .grid-3{grid-template-columns:1fr 1fr} .grid-4{grid-template-columns:1fr 1fr} }
+    @media (max-width: 640px){ .grid-3, .grid-4{grid-template-columns:1fr} }
+    .table { width:100%; border-collapse:collapse }
+    .table th,.table td{ border-bottom:1px solid #eef2f6; padding:10px; text-align:left; vertical-align:top }
+    .table th{ background:#fafcff; font-weight:600 }
+    .actions { display:flex; gap:8px; flex-wrap:wrap }
+    .btn-sm{ padding:6px 10px; font-size:.9rem }
+  </style>
+</head>
+<body>
+<header class="header">
+  <div class="container nav">
+    <div class="brand admin-top">
+      <h1 class="brand-title">Admin · SOUTECH</h1>
+      <span class="pill" id="adminUser">Admin</span>
+    </div>
+    <nav class="nav-links">
+      <a href="/">Loja</a>
+      <button class="btn" id="btnLogout" type="button">Sair</button>
+    </nav>
+  </div>
+</header>
+
+<main class="container section">
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-tab="produtos">Cadastrar itens</button>
+    <button class="tab" data-tab="novo-cliente">Cadastrar clientes</button>
+    <button class="tab" data-tab="clientes">Lista de clientes</button>
+  </div>
+
+  <!-- ===================== PRODUTOS ===================== -->
+  <section id="produtos" class="section">
+    <h3 style="margin-bottom:12px">Produtos</h3>
+
+    <form id="formProduct" class="card" style="margin-bottom:16px">
+      <div class="grid-2">
+        <input id="p_name" placeholder="Nome" required />
+        <input id="p_sku" placeholder="SKU" required />
+      </div>
+      <div class="grid-2">
+        <input id="p_price" type="number" step="0.01" placeholder="Preço (R$)" required />
+        <input id="p_cat" placeholder="Categoria (ex.: Sensores)" />
+      </div>
+      <div class="grid-2">
+        <input id="p_img" placeholder="URL da imagem" />
+        <input id="p_tags" placeholder="Tags (ex.: Modbus,IP67) separadas por vírgula" />
+      </div>
+      <div class="row">
+        <label><input id="p_active" type="checkbox" checked /> Ativo</label>
+        <button class="btn brand" id="btnSave" type="button" style="margin-left:auto">Salvar</button>
+      </div>
+    </form>
+
+    <div class="card" style="overflow-x:auto">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th><th>Nome</th><th>SKU</th><th>Categoria</th><th>Tags</th><th>Preço</th><th>Ativo</th><th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="productsBody">
+          <tr><td colspan="8">Carregando…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===================== NOVO CLIENTE ===================== -->
+  <section id="novo-cliente" class="section hidden">
+    <h3 style="margin-bottom:12px">Cadastrar cliente</h3>
+    <form id="formCustomer" class="card">
+      <div class="grid-3">
+        <input id="c_name" placeholder="Nome/Razão social" required />
+        <input id="c_email" type="email" placeholder="E-mail" required />
+        <input id="c_phone" placeholder="Telefone (DDD + número)" />
+      </div>
+
+      <div class="grid-3">
+        <select id="c_doc_type">
+          <option value="CPF">CPF</option>
+          <option value="CNPJ">CNPJ</option>
+        </select>
+        <input id="c_doc_number" placeholder="Documento (apenas números)" />
+        <input id="c_password" type="password" placeholder="Senha inicial (mín. 6)" minlength="6" required />
+      </div>
+
+      <div class="grid-4">
+        <input id="c_zip" placeholder="CEP" />
+        <input id="c_state" placeholder="UF" />
+        <input id="c_city" placeholder="Cidade" />
+        <input id="c_district" placeholder="Bairro" />
+      </div>
+
+      <div class="grid-3">
+        <input id="c_street" placeholder="Logradouro" />
+        <input id="c_number" placeholder="Número" />
+        <input id="c_complement" placeholder="Complemento" />
+      </div>
+
+      <div class="row">
+        <label><input id="c_is_admin" type="checkbox" /> Conceder acesso de administrador</label>
+        <button class="btn brand" id="btnCreateCustomer" type="button" style="margin-left:auto">Criar cliente</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ===================== LISTA DE CLIENTES ===================== -->
+  <section id="clientes" class="section hidden">
+    <div class="row" style="align-items:center; gap:12px; margin-bottom:8px">
+      <h3 style="margin:0">Clientes</h3>
+      <span class="muted" id="usersInfo">—</span>
+    </div>
+
+    <div class="card" style="overflow-x:auto">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th><th>Nome</th><th>E-mail</th><th>Documento</th>
+            <th>Telefone</th><th>Endereço</th><th>Admin</th><th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="usersBody">
+          <tr><td colspan="8">Carregando…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<script src="/static/js/admin.js"></script>
+</body>
+</html>

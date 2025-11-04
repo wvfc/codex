@@ -1,0 +1,10 @@
+entre com vemv
+
+.\.venv\Scripts\activate
+
+apos entre na pasta
+ cd C:\Users\Walte\OneDrive\Desktop\PROJETOS SOUTECH\tst
+
+ apos rode
+
+ python -m uvicorn backend.main:app --port 8001 --reload

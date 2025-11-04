@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SOUTECH - Loja Online</title>
+
+  <!-- performance das fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="/static/css/style.css" />
+
+  <style>
+    .header .container{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px}
+    .brand{grid-column:2;justify-self:center;display:flex;align-items:center;gap:10px}
+    .nav-links{grid-column:3;justify-self:end;display:flex;align-items:center;gap:12px}
+    .brand-title{margin:0}
+
+    .product-thumb{width:100%;aspect-ratio:1/1;display:grid;place-items:center;overflow:hidden}
+    .product-thumb img{width:240px;height:240px;object-fit:cover;border-radius:10px}
+
+    .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+    .card{display:flex;flex-direction:column;gap:8px}
+
+    #overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(2px);
+      opacity:0;pointer-events:none;transition:.2s ease;z-index:48}
+    #overlay.show{opacity:1;pointer-events:auto}
+    .cart-drawer{position:fixed;top:0;right:0;z-index:50;width:min(420px,92vw);height:100dvh;
+      transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
+    .cart-drawer.open{transform:translateX(0)}
+    .cart-drawer__header,.cart-drawer__summary{padding:14px}
+    .cart-drawer__list{padding:14px;overflow:auto;flex:1}
+    .cart-item{display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:center}
+    .cart-item img{width:56px;height:56px;object-fit:cover;border-radius:8px}
+
+    .user-pill{display:none;align-items:center;gap:8px;padding:8px 12px;border-radius:999px}
+    .user-pill .name{max-width:18ch;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+    @media (max-width:640px){
+      .product-thumb img{width:140px;height:140px}
+      .cart-item{grid-template-columns:44px 1fr auto}
+      .cart-item img{width:44px;height:44px}
+    }
+  </style>
+</head>
+<body>
+<header class="header">
+  <div class="container">
+    <div style="grid-column:1"></div>
+
+    <div class="brand">
+      <img src="/static/img/logo.png" alt="SOUTECH" class="logo" onerror="this.style.display='none'"/>
+      <h1 class="brand-title">SOUTECH Store</h1>
+    </div>
+
+    <nav class="nav-links">
+      <a href="/login">Entrar</a>
+      <a href="#sobre">Sobre</a>
+      <a href="#contato">Contato</a>
+
+      <a id="myAccountLink" href="/cliente" class="user-pill">
+        <span id="userName" class="name">—</span>
+      </a>
+
+      <button class="btn brand" data-open-cart type="button" role="button" aria-controls="cart">
+        Carrinho <span class="badge" id="cartCount">0</span>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<section class="banner"><h2>Compre com suporte técnico especializado</h2></section>
+
+<main class="container">
+  <section class="filters" style="display:flex;gap:10px;flex-wrap:wrap;margin:16px 0">
+    <input id="q" type="search" placeholder="Buscar (ex: ESP32, CFW5)" />
+    <select id="categoria">
+      <option value="">Todas</option>
+      <option>Sensores</option><option>Inversores</option><option>IoT</option><option>Serviços</option>
+    </select>
+    <select id="ordenar">
+      <option value="nome-asc">Nome (A→Z)</option>
+      <option value="preco-asc">Preço (menor)</option>
+      <option value="preco-desc">Preço (maior)</option>
+      <option value="novidades">Novidades</option>
+    </select>
+    <button class="btn" id="btnAplicarFiltros" type="button">Aplicar</button>
+  </section>
+
+  <section class="section">
+    <div class="section-head" style="display:flex;justify-content:space-between;align-items:center">
+      <h3>Produtos</h3>
+      <span id="resultInfo" class="muted">Carregando…</span>
+    </div>
+
+    <div id="lista" class="grid"></div>
+    <div id="paginacao" class="pagination" style="display:flex;gap:8px;justify-content:center;margin:18px 0"></div>
+  </section>
+
+  <section id="sobre" class="section card">
+    <h3>Sobre</h3>
+    <p class="muted">Especialistas em automação industrial, vibração e IoT. NF-e, garantia e envio nacional.</p>
+  </section>
+
+  <section id="contato" class="section card">
+    <h3>Contato</h3>
+    <form id="formContato" novalidate>
+      <div class="row" style="flex-wrap:wrap">
+        <input id="nome" name="nome" placeholder="Seu nome" required />
+        <input id="email" name="email" type="email" placeholder="Seu e-mail" required />
+      </div>
+      <textarea id="mensagem" name="mensagem" placeholder="Como podemos ajudar?" rows="4" required style="width:100%;margin-top:10px"></textarea>
+      <div class="row" style="margin-top:10px">
+        <button class="btn" type="submit">Enviar</button>
+        <span id="contatoStatus" class="muted" aria-live="polite"></span>
+      </div>
+    </form>
+  </section>
+</main>
+
+<div id="overlay" hidden></div>
+
+<aside id="cart" class="cart-drawer" aria-hidden="true" role="dialog" aria-label="Carrinho">
+  <header class="cart-drawer__header" style="display:flex;justify-content:space-between;align-items:center">
+    <h3>Seu carrinho</h3>
+    <button data-close-cart type="button" aria-label="Fechar">×</button>
+  </header>
+
+  <ul id="cartItems" class="cart-drawer__list"></ul>
+
+  <div class="cart-drawer__summary">
+    <div class="row"><span>Subtotal</span><strong id="subtotal">R$ 0,00</strong></div>
+    <div class="row total"><span>Total</span><strong id="total">R$ 0,00</strong></div>
+
+    <div class="row" style="flex-wrap:wrap;margin-top:10px">
+      <input id="checkout_name" placeholder="Seu nome" autocomplete="name" />
+      <input id="checkout_email" placeholder="Seu e-mail" type="email" autocomplete="email" />
+    </div>
+
+    <button id="btnCheckout" class="btn brand" type="button">Finalizar compra</button>
+    <a id="btnLoginToCheckout" class="btn" href="/login" style="display:none">Entrar para finalizar</a>
+  </div>
+</aside>
+
+<footer class="footer">© <span id="year"></span> SOUTECH - Todos os direitos reservados</footer>
+
+<!-- use defer para não bloquear render -->
+<script src="/static/js/app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Minha conta • SOUTECH Store</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="/static/css/style.css" rel="stylesheet" />
+  <style>
+    .page { max-width: 1100px; margin: 0 auto; padding: 32px 16px; }
+    .header-row { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .h-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .btn { background: var(--brand,#004d61); color:#fff; border:none; padding:.6rem 1rem; border-radius:.6rem; cursor:pointer; font-weight:600; }
+    .btn.light { background:#fff; color:var(--brand,#004d61); border:1px solid var(--brand,#004d61); }
+    .btn.gray { background:#f3f5f7; color:#333; border:1px solid #e5e7eb; }
+    .btn:hover { opacity:.9 }
+    .grid { display:grid; gap:16px; grid-template-columns: 1fr; }
+    @media (min-width: 900px){ .grid{ grid-template-columns:1fr 1fr; } }
+
+    .card { background:#fff; border:1px solid #e5e7eb; border-radius:14px; padding:18px; }
+    .muted { color:#6b7280 }
+    .kv { display:grid; grid-template-columns:140px 1fr; gap:10px 16px; }
+    .badge { background:#eaf4ff; color:#0b5fff; border-radius:999px; padding:.2rem .6rem; font-weight:700; display:inline-block; }
+    .badge.ok { background:#e8fff3; color:#0f8a3b; }
+    .hidden { display:none !important; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header__inner" style="display:flex;align-items:center;gap:16px;justify-content:center;">
+      <div class="logo" style="margin-right:auto;"><a href="/" class="logo__link">SOUTECH <strong>Store</strong></a></div>
+      <div class="h-actions">
+        <a class="btn light" href="/">Voltar à loja</a>
+        <a id="adminLinkWrap" class="btn hidden" href="/admin">Ir para o Admin</a>
+        <button id="btnLogout" class="btn gray" type="button">Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <h1 style="margin:0 0 8px 0;">Minha conta</h1>
+    <p class="muted" id="hello">Olá!</p>
+
+    <div class="grid" style="margin-top:16px;">
+      <section class="card">
+        <h3 style="margin-top:0">Seus dados</h3>
+        <div class="kv" style="margin-top:10px;">
+          <div class="muted">Nome</div>          <div id="clientName">—</div>
+          <div class="muted">E-mail</div>        <div><span id="clientEmail">—</span> <button id="copyMail" class="btn gray" style="padding:.3rem .6rem;margin-left:8px;">Copiar e-mail</button></div>
+          <div class="muted">Administrador</div> <div><span id="isAdminBadge" class="badge">cliente</span></div>
+          <div class="muted">Criado em</div>     <div id="clientCreated">—</div>
+        </div>
+      </section>
+
+      <aside class="card">
+        <h3 style="margin-top:0">Ajuda e suporte</h3>
+        <p class="muted">Precisa de ajuda com um pedido, nota fiscal ou instalação? Fale conosco:</p>
+        <ul>
+          <li>WhatsApp: <strong>+55 65 9 9844–2334</strong></li>
+          <li>E-mail: <strong>adm@soutechautomacao.com</strong></li>
+        </ul>
+      </aside>
+    </div>
+
+    <section class="card" style="margin-top:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <h3 style="margin:0;">Meus pedidos</h3>
+        <span class="muted" id="ordersCount">0 pedido(s)</span>
+      </div>
+      <div id="ordersEmpty" class="muted" style="margin-top:10px;">Nenhum pedido encontrado.</div>
+    </section>
+  </main>
+
+  <script src="/static/js/cliente.js"></script>
+</body>
+</html>

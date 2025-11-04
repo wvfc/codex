@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Entrar / Criar conta — SOUTECH</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <style>
+    .wrap{max-width:980px;margin:32px auto;padding:12px}
+    .card form{display:grid;gap:10px}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .help{font-size:.9rem}
+    .switch{margin-top:10px}
+    .center{text-align:center}
+    .brandbar{background:var(--brand,#004d61);color:#fff;padding:14px}
+  </style>
+</head>
+<body>
+<header class="brandbar">
+  <div class="wrap" style="display:flex;justify-content:space-between;align-items:center">
+    <strong>SOUTECH Store</strong>
+    <a href="/" class="btn">Loja</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <h2 class="center">Entrar</h2>
+
+  <!-- LOGIN PRIMEIRO -->
+  <section class="card" id="boxLogin">
+    <h3>Fazer login</h3>
+    <form id="formLogin">
+      <input id="login_email" type="email" placeholder="E-mail" required />
+      <input id="login_password" type="password" placeholder="Senha" required />
+      <button class="btn btn-primary" type="submit">Entrar</button>
+      <div id="loginMsg" class="help muted" aria-live="polite"></div>
+    </form>
+    <div class="switch">
+      <button class="btn" type="button" id="showSignup">Não tem conta? Criar conta</button>
+    </div>
+  </section>
+
+  <!-- SIGNUP COMPLETO -->
+<section class="card" id="boxSignup" style="display:none">
+  <h3>Criar conta</h3>
+
+  <form id="formSignup" autocomplete="on">
+    <!-- Dados de acesso -->
+    <div class="row">
+      <input id="su_name" name="name" placeholder="Seu nome completo" required />
+      <input id="su_email" name="email" type="email" placeholder="Seu e-mail" required />
+    </div>
+    <div class="row">
+      <input id="su_pass1" name="password" type="password" placeholder="Senha" minlength="6" required />
+      <input id="su_pass2" type="password" placeholder="Confirmar senha" minlength="6" required />
+    </div>
+
+    <hr>
+
+    <!-- Documento -->
+    <div class="row">
+      <label class="btn" style="cursor:default">Documento:</label>
+      <label class="btn"><input type="radio" name="doc_type" value="CPF" checked> CPF</label>
+      <label class="btn"><input type="radio" name="doc_type" value="CNPJ"> CNPJ</label>
+    </div>
+    <div class="row">
+      <input id="su_doc" placeholder="CPF" inputmode="numeric" maxlength="18" />
+      <input id="su_phone" placeholder="Telefone (WhatsApp)" inputmode="tel" maxlength="20" />
+    </div>
+
+    <hr>
+
+    <!-- Endereço -->
+    <div class="row">
+      <input id="su_cep" placeholder="CEP" inputmode="numeric" maxlength="9" />
+      <button class="btn" type="button" id="btnBuscaCep" title="Buscar CEP">Buscar CEP</button>
+    </div>
+    <div class="row">
+      <input id="su_address" placeholder="Endereço (logradouro)" />
+      <input id="su_number" placeholder="Número" />
+      <input id="su_complement" placeholder="Complemento" />
+    </div>
+    <div class="row">
+      <input id="su_district" placeholder="Bairro" />
+      <input id="su_city" placeholder="Cidade" />
+      <input id="su_state" placeholder="UF" maxlength="2" />
+    </div>
+
+    <button class="btn btn-primary" type="submit">Cadastrar</button>
+    <div id="signupMsg" class="help muted" aria-live="polite"></div>
+  </form>
+
+  <div class="switch">
+    <button class="btn" type="button" id="showLogin">Já tenho conta</button>
+  </div>
+</section>
+
+</main>
+
+<!---<script>
+const API = location.origin;
+const $ = (s)=>document.querySelector(s);
+function onlyDigits(s){ return (s||"").replace(/\D+/g,""); }
+
+function saveToken(t){ localStorage.setItem("auth_token", t); }
+function saveUser(u){ localStorage.setItem("auth_user", JSON.stringify(u||{})); }
+
+/* alternância */
+$("#showSignup").addEventListener("click", ()=>{
+  $("#boxLogin").style.display="none"; $("#boxSignup").style.display="";
+});
+$("#showLogin").addEventListener("click", ()=>{
+  $("#boxSignup").style.display="none"; $("#boxLogin").style.display="";
+});
+
+/* login */
+$("#formLogin").addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  $("#loginMsg").textContent = "";
+  const email = $("#login_email").value.trim();
+  const password = $("#login_password").value;
+  const res = await fetch(`${API}/api/auth/login`, {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({email,password})
+  });
+  if(res.status===401){
+    $("#loginMsg").textContent = "E-mail não encontrado ou senha inválida.";
+    $("#boxSignup").style.display="";
+    return;
+  }
+  if(!res.ok){ $("#loginMsg").textContent="Erro ao entrar."; return; }
+  const data = await res.json();
+  saveToken(data.access_token);
+  /* pega dados do usuário e guarda */
+  const me = await fetch(`${API}/api/auth/me`, {headers:{Authorization:`Bearer ${data.access_token}`}});
+  if (me.ok) {
+    const user = await me.json();
+    localStorage.setItem("auth_user", JSON.stringify(user));
+  }
+  /* volta para a loja (ou /cliente.html) */
+  location.href = "/";
+});
+
+/* signup */
+// ===== máscaras simples =====
+function maskCPF(v){
+  v = onlyDigits(v).slice(0,11);
+  return v.replace(/(\d{3})(\d)/,"$1.$2")
+          .replace(/(\d{3})(\d)/,"$1.$2")
+          .replace(/(\d{3})(\d{1,2})$/,"$1-$2");
+}
+function maskCNPJ(v){
+  v = onlyDigits(v).slice(0,14);
+  return v.replace(/^(\d{2})(\d)/,"$1.$2")
+          .replace(/^(\d{2})\.(\d{3})(\d)/,"$1.$2.$3")
+          .replace(/\.(\d{3})(\d)/,".$1/$2")
+          .replace(/(\d{4})(\d)/,"$1-$2");
+}
+function maskPhone(v){
+  v = onlyDigits(v).slice(0,11);
+  if(v.length<=10) return v.replace(/(\d{2})(\d{4})(\d{0,4})/,"($1) $2-$3");
+  return v.replace(/(\d{2})(\d{5})(\d{0,4})/,"($1) $2-$3");
+}
+function maskCEP(v){
+  v = onlyDigits(v).slice(0,8);
+  return v.replace(/(\d{5})(\d)/,"$1-$2");
+}
+
+// ===== troca CPF/CNPJ =====
+const docInput = $("#su_doc");
+document.querySelectorAll("input[name='doc_type']").forEach(r=>{
+  r.addEventListener("change", ()=>{
+    docInput.value = "";
+    docInput.placeholder = r.value;
+    docInput.focus();
+  });
+});
+// aplica máscaras
+docInput.addEventListener("input", ()=>{
+  const type = document.querySelector("input[name='doc_type']:checked").value;
+  docInput.value = type==="CPF" ? maskCPF(docInput.value) : maskCNPJ(docInput.value);
+});
+$("#su_phone").addEventListener("input", e=> e.target.value = maskPhone(e.target.value));
+$("#su_cep").addEventListener("input",  e=> e.target.value = maskCEP(e.target.value));
+
+// ===== ViaCEP =====
+async function buscaCEP(cepRaw){
+  const cep = onlyDigits(cepRaw);
+  if(cep.length !== 8) return;
+  try{
+    const r = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    if(!r.ok) return;
+    const d = await r.json();
+    if(d.erro) return;
+    $("#su_address").value   = d.logradouro || "";
+    $("#su_district").value  = d.bairro || "";
+    $("#su_city").value      = d.localidade || "";
+    $("#su_state").value     = (d.uf || "").toUpperCase();
+  }catch(_){}
+}
+$("#btnBuscaCep").addEventListener("click", ()=> buscaCEP($("#su_cep").value) );
+
+// ===== envio de cadastro =====
+$("#formSignup").addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  $("#signupMsg").textContent="";
+
+  const name  = $("#su_name").value.trim();
+  const email = $("#su_email").value.trim();
+  const p1    = $("#su_pass1").value;
+  const p2    = $("#su_pass2").value;
+  if(p1!==p2){ $("#signupMsg").textContent="As senhas não conferem."; return; }
+
+  const doc_type   = document.querySelector("input[name='doc_type']:checked").value;
+  const doc_number = onlyDigits($("#su_doc").value);
+  const phone      = onlyDigits($("#su_phone").value);
+
+  const payload = {
+    name, email, password: p1,
+    doc_type, doc_number, phone,
+    cep: $("#su_cep").value.trim(),
+    address: $("#su_address").value.trim(),
+    number: $("#su_number").value.trim(),
+    complement: $("#su_complement").value.trim(),
+    district: $("#su_district").value.trim(),
+    city: $("#su_city").value.trim(),
+    state: $("#su_state").value.trim().toUpperCase().slice(0,2)
+  };
+
+  const res = await fetch(`${API}/api/auth/signup`, {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify(payload)
+  });
+  if(!res.ok){
+    let msg = "Erro ao cadastrar.";
+    try{ const d = await res.json(); msg = d.detail || msg; }catch{}
+    $("#signupMsg").textContent = msg; return;
+  }
+
+  // login automático
+  const r2 = await fetch(`${API}/api/auth/login`, {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({email, password:p1})
+  });
+  if(!r2.ok){ location.href="/login"; return; }
+
+  const data = await r2.json();
+  localStorage.setItem("auth_token", data.access_token);
+
+  const me = await fetch(`${API}/api/auth/me`, {headers:{Authorization:`Bearer ${data.access_token}`}});
+  if(me.ok){ localStorage.setItem("auth_user", JSON.stringify(await me.json())); }
+
+  location.href = "/cliente"; // vai para a página do cliente já com dados
+});
+</script>-->
+
+<script src="/static/js/login.js" defer></script>
+</body>
+</html>
